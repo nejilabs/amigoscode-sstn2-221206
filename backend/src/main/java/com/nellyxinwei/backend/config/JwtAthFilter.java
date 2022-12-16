@@ -15,13 +15,15 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.nellyxinwei.backend.dao.UserDao;
+
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAthFilter extends OncePerRequestFilter {
 
-  private final UserDetailsService userDetailsService;
+  private final UserDao userDao;
   private final JwtUtils jwtUtils;
 
   @Override
@@ -41,7 +43,7 @@ public class JwtAthFilter extends OncePerRequestFilter {
     jwtToken = authHeader.substring(7);
     userEmail = jwtUtils.extractUsername(jwtToken);
     if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-      UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
+      UserDetails userDetails = userDao.findUserByEmail(userEmail);
 
       if (jwtUtils.isTokenValid(jwtToken, userDetails)) {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null,
