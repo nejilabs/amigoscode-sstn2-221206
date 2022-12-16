@@ -23,6 +23,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.nellyxinwei.backend.dao.UserDao;
+
 import io.jsonwebtoken.lang.Arrays;
 import lombok.RequiredArgsConstructor;
 
@@ -31,19 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
   private final JwtAthFilter jwtAthFilter;
-
-  private final static List<UserDetails>APPLICATION_USERS = Arrays.asList(
-    new User(
-      "test.user1@mail.com",
-      "password",
-      Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN"))
-    ),
-    new User(
-      "test.user2@mail.com",
-      "password",
-      Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
-    )
-  )
+  private final UserDao userDao;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -84,11 +74,7 @@ public class SecurityConfig {
     return new UserDetailsService() {
       @Override
       public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return APPLICATION_USERS
-            .stream()
-            .filter(u -> u.getUsername().equals(email))
-            .findFirst()
-            .orElseThrow(() -> new UsernameNotFoundException("No user was found"));
+        return userDao.findUserByEmail(email);
       }
     };
   }

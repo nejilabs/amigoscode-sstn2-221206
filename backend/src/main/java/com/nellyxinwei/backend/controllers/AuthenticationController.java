@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nellyxinwei.backend.config.JwtUtils;
+import com.nellyxinwei.backend.dao.UserDao;
 import com.nellyxinwei.backend.dto.AuthenticationRequest;
 
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthenticationController {
 
   private final AuthenticationManager authenticationManager;
-  private final UserDetailsService userDetailsService;
+  private final UserDao userDao;
   private final JwtUtils jwtUtils;
 
   @PostMapping("/authenticate")
@@ -29,7 +30,7 @@ public class AuthenticationController {
       @RequestBody AuthenticationRequest request) {
     authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-    final UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
+    final UserDetails user = userDao.findUserByEmail(request.getEmail());
     if (user != null) {
       return ResponseEntity.ok(jwtUtils.generateToken(user));
     }
