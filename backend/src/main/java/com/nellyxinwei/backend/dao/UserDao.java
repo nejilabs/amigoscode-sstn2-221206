@@ -23,7 +23,7 @@ public class UserDao {
       "password",
       Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
     )
-  )
+  );
 
   public UserDetails findUserByEmail(String email) {
     return APPLICATION_USERS
